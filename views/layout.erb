@@ -8,12 +8,6 @@
 <body>
 	<nav>
 		<div>
-			<p>Nav:</p>
-			<a href="/items">Item list</a> •
-			<a href="/items/add">Add Items</a> •
-			<a href="/items/ajax">AJAX version</a>
-		</div>
-		<div>
 			<% if !session[:logged_in] %>
 				<a href="/user/login">Login</a>
 			<% else %>

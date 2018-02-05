@@ -12,14 +12,6 @@ class ItemController < ApplicationController
 		erb :item_index_ajax
 	end
 
-	# index route
-	get '/' do
-		@user = User.find session[:user_id]
-
-		@items = @user.items.order(:id) # how fucking cool is this
-
-		erb :item_index
-	end
 
 	# json index route
 	get '/j' do
@@ -38,24 +30,6 @@ class ItemController < ApplicationController
 
 	end
 
-	# add route
-	get '/add' do
-		@page = "Add Items"
-		@action = "/items/add"
-		@method = "POST"
-		@placeholder = "I AM HUNGRY"
-		@value = ""
-		@buttontext = "~*~ADD IT~*~🏈"
-	 	# res.render()
-		erb :add_item
-	end
-
-	# edit route
-	get '/edit/:id' do
-		@item = Item.find params[:id]
-		@page = "Edit item #{@item.id}"
-		erb :edit_item
-	end
 
 	# API edit route
 	get '/j/edit/:id' do
@@ -70,22 +44,7 @@ class ItemController < ApplicationController
 		resp.to_json
 	end 
 
-	# create route
-	post '/add' do 
-		pp params
-		# "good job you posted check termins"
 
-		@item = Item.new
-		@item.title = params[:title]
-		@item.user_id = session[:user_id]
-		@item.save
-
-		session[:message] = "You added item #{@item.id}"
-
-		# @item.to_json
-		redirect '/items'
-
-	end
 
 	post '/j' do
 		@item = Item.new
@@ -106,12 +65,7 @@ class ItemController < ApplicationController
 
 	end
 
-	delete '/:id' do
-		@item = Item.find params[:id]
-		@item.delete
-		session[:message] = "You deleted item #{@item.id}"
-		redirect '/items'
-	end
+
 
 	# API delete route
 	delete '/j/:id' do
