@@ -1,12 +1,12 @@
 class ItemController < ApplicationController
 
 	# the code this filter will be run on all /item routes
-	before do
-		if !session[:logged_in]
-			session[:message] = "You must be logged in to do that"
-			redirect '/user/login'
-		end
-	end
+	# before do
+	# 	if !session[:logged_in]
+	# 		session[:message] = "You must be logged in to do that"
+	# 		redirect '/user/login'
+	# 	end
+	# end
 
 	get '/ajax' do
 		erb :item_index_ajax
@@ -27,9 +27,20 @@ class ItemController < ApplicationController
 			items: @items
 		}
 		resp.to_json
-
 	end
 
+	get '/j/:id' do
+		@user = User.find params[:id]
+		@items = @user.items.order(:id)
+		resp = {
+			status: {
+				all_good: true,
+				number_of_results: @items.length
+			},
+			items: @items
+		}
+		resp.to_json
+	end
 
 	# API edit route
 	get '/j/edit/:id' do
@@ -45,13 +56,18 @@ class ItemController < ApplicationController
 	end 
 
 
+	get '/j/:userid/edit/:itemid' do
+		@user = User.find params[:userid]
+		@item = @user.items.where(id: params[:itemid])
+		
+	end
+
 
 	post '/j' do
 		@item = Item.new
 		@item.title = params[:title]
-		@item.user_id = session[:user_id]
+		@item.user_id = params[:user_id]
 		@item.save
-
 		resp = {
 			# you could include a message or something
 			# you could include pagination info
