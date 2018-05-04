@@ -1,16 +1,14 @@
 ![ga_chi](https://avatars3.githubusercontent.com/u/12513784?s=200&v=4)
 
-## wdi-10-chi _fluff-hounds_
+## wdi-11-chi _curious-turtles_
 
 
 
 # Full Stack Sinatra with ActiveRecord, Sessions, and Bcrypt
 
-Follow each step of this lab. For each step, try to do it yourself and see if you can get it to work. If you're stumped, click the arrow by "Details" to show the hidden code (works best when this file is viewed on github).
+Follow each step of this lab. For each step, try to do it yourself first and see if you can get it to work. If you're stumped, click the arrow by "Details" to show the hidden code (works best when this file is viewed on github).
 
-If you end up using the code here, type it out yourself.  
-
-For a few sections, the code is not hidden.
+For example:
 
 <details>
 
@@ -23,11 +21,13 @@ end
 
 </details>
 
+Whether or not you use the provided code, **TYPE ALL THE CODE FOR THIS LESSON OUT YOURSELF. DO NOT PASTE. THIS WILL HELP YOU GET USED TO IT.**
+
+For a few sections, generally ones with new information, the code is not hidden.  
+
 ### 1. Set up the files for a Sinatra app.
 
 #### Gemfile
-
-> Note because of a bug (documented [here](https://github.com/rails/rails/issues/31673) and [here](https://github.com/rails/rails/issues/31669) and probably several other places) at the time of this writing, it is necessary to manually specify '0.21' or the `pg` gem won't be picked up.  You would normally just be able to put `pg`.
 
 ```ruby
 source 'https://rubygems.org'
@@ -38,7 +38,6 @@ gem 'sinatra-activerecord'
 gem 'json'
 gem 'pry'
 gem 'bcrypt'
-
 ```
 
 Since we added some gems, we `bundle`. Take a look at the Gemfile.lock that is generated.
@@ -182,7 +181,7 @@ If it renders, then...
 
 For section 5, the code is not hidden.
 
-:black_small_square: Create a file, `db/migrations.sql` to represent our database structure. Write out the SQL below EXACTLY. **Do not change any capitalizations, punctuation, singular/plural, or table/column names.** Notice how we are describing relations between the tables. When you're done typing it out, open your `psql`. Run `DROP DATABASE item;` then copy/paste the contents of the file. 
+:black_small_square: Create a file, `db/migrations.sql` to represent our database structure. Write out the SQL below EXACTLY. **Do not change any capitalizations, punctuation, singular/plural, or table/column names.** Notice how we are describing relations between the tables--specifically `user_id REFERENCES users(id)`--that is how we know that a User **has** Items. That's the "relation"... we say "A **User has many items**." Incidentally, we also say **an item *belongs to* a user**. This is not just a PSQL or ActiveRecord thing—that's how you generally describe relationships in your data. When you're done typing it out, open `psql`.  Run `DROP DATABASE item;` then copy/paste the contents of the file. 
 
 #### db/migrations.sql
 
@@ -206,12 +205,12 @@ CREATE TABLE items(
 
 :black_small_square: Check that it was successful by
 
- * reading output from the psql terminal after you paste, and 
+ * reading **every line of output carefully** from the psql terminal after you paste, and 
  * checking out your tables: `\d users` and `\d items`
 
-Similarly, you can create a `seed.sql` or `seeds.sql` to insert a lot of data all at once. Helpful if you need to clear or reset or move your database, or when you deploy an app, or when you clone an existing project.
+Similarly, you can create a `seeds.sql` file you can use to insert a lot of data all at once. This is helpful if you need to clear or reset or move your database, or when you deploy an app, or when you clone an existing project, and need some data to work with during development.
 
-:black_small_square: Create a file `db/seeds.sql` with SQL for a user your name (lol) and password. 
+:black_small_square: Create a file `db/seeds.sql` with SQL for a user with your name (lol) and password. 
 
 #### db/seeds.sql
 
@@ -219,7 +218,7 @@ Similarly, you can create a `seed.sql` or `seeds.sql` to insert a lot of data al
 INSERT INTO users (username, password) VALUES ('reuben', '12345');
 ```
 
-> Yes, there is a way to automate the migrations/seeds process. No, people don't always just paste it, but we will be for now.  
+> Yes, there is a way to automate the migrations/seeds process in both Sinatra AND Rails. No, people don't always just paste it, but we will be for the remainder of this unit. 
 
 :black_small_square: Require ActiveRecord in `config.ru`.
 
@@ -229,7 +228,7 @@ INSERT INTO users (username, password) VALUES ('reuben', '12345');
 require 'sinatra/activerecord'
 ```
 
-:black_small_square: Add the code to connect to an 'item' database in ApplicationController
+:black_small_square: Add the code to connect to an 'item' database in ApplicationController.  Database name here must match database name in your migrations.sql file.  
 
 #### controllers/ApplicationController.rb, after bundle stuff and before setting views folder:
 
@@ -252,7 +251,7 @@ If you are able to start your server...
 
 Since we're about to have several different views, but still want to have a lot of things consistent across our whole site, we're going to use partials.
 
-:black_small_square: Create a `layout.erb` template. Cut **all** of the code from `hello.erb` and paste it into `layout.erb`. In `hello.erb`, which should now be empty, add an `h2` saying "this is the hello template":
+:black_small_square: Create a `layout.erb` template. Cut **all** of the code from `hello.erb` and paste it into `layout.erb`. In `hello.erb`, which should now be empty, you'll just have an `h2` saying "this is the hello template":
 
 <details>
 
@@ -264,6 +263,7 @@ Since we're about to have several different views, but still want to have a lot 
 
 </details>
 <br />
+> We're using inline styles here to point out what divs are coming from what partials.  DO NOT USE INLINE STYLES IN YOUR APPS.
 
 :black_small_square: Add the `yield` to the body in `layout.erb`, below the `<h1>`
 
@@ -287,6 +287,13 @@ Since we're about to have several different views, but still want to have a lot 
 ```erb
 <title><%= @page %></title>
 ```
+If you want you could also throw some text in layout.erb to help yourself remember where which text is coming from.
+
+```erb
+  <small>Thanks for using this site. This "footer" is in the main
+  layout.erb and will appear on all pages. © 2018 no one.</small>
+```
+
 
 </details>
 <br />
@@ -353,7 +360,7 @@ map('/items') {
 </details>
 <br>
 
-If you can view '/items' then...
+If you can view `'/items'` then...
 
 ---
 
@@ -382,19 +389,19 @@ Create a partial `form.erb` with a form that has a red border that posts to `@ac
 
 #### Dabbling with nested partials: you can render a partial within a partial:
 
-Create a the add_item partial mentioned above.  It should have only an `<h2>` with the name of the page and below that the following line: 
+Create the `add_item` partial mentioned in the comment in the previous step.  It should have only an `<h2>` with the name of the page, and then below that, the following line: 
 ```erb
 <%= erb(:form) %>
 ```
 
-Edit the Item add route to send along all the proper values for the instance variables in `form.erb` and `layout.erb` and make the post to an as yet nonexistent '/items' post route.
+Edit the Item add route to send along all the proper values for the instance variables in `form.erb` and `layout.erb` and make the post to an as yet nonexistent `'/items'` post route.
 
 <details>
 
-`controllers/ItemController.rb`, in the `get '/add'` route
+`controllers/ItemController.rb`, in the `get '/add'` route, before the return:
 ```ruby
 	@page = "Add Item"
-	@action = "/items/add"
+	@action = "/items"
 	@method = "POST"
 	@placeholder = "Enter your item!"
 	@value=""
@@ -404,7 +411,7 @@ Edit the Item add route to send along all the proper values for the instance var
 </details>
 <br>
 
-It's overkill for our needs...the purpose is just to demonstrate. But it is certainly very DRY!  
+This is perhaps a bit overkill...the purpose is just to demonstrate.  But make sure you have text on your button and in your input placeholder and page title.  And make sure that when you click the button, it tries to `POST` to `/items`.
 
 ---
 
@@ -414,7 +421,7 @@ It's overkill for our needs...the purpose is just to demonstrate. But it is cert
 
 ### 9. Items dummy post route
 
-Make an item _create_ route that prints the form data to the terminal and just sends back: "you posted. check your terminal."  Try to post something and make sure your data looks right in the terminal.
+When you clicked that button, turns out Sinatra didn't know that ditty (i.e. you haven't defined `post '/' do ...etc...`), so let's teach it to Sinatra. Make an item _create_ route that prints the form data to the terminal and just sends back: "you posted. check your terminal."  Try to post something and make sure your data looks right in the terminal.
 
 <details>
 
@@ -422,11 +429,14 @@ Make an item _create_ route that prints the form data to the terminal and just s
 
 ```ruby
 # create route
-post '/add' do
-	# params are in a hash called params, check your terminal
-	pp params
-	"you posted. check your terminal."
-end
+  post '/add' do
+    # params are in a hash called params, check your terminal
+    # extra puts statements help you find this output amongst the very verbose terminal output
+    puts "HERE IS THE PARAMS---------------------------------------"
+    pp params
+    puts "---------------------------------------------------------"
+    "you posted. check your terminal."
+  end
 ```
 
 </details>
@@ -441,7 +451,7 @@ end
 
 ### 10. Make items create route use ActiveRecord to actually insert in your db.
 
-First you will need to create your model.  You're gonna _love_ how easy it is:
+First you will need to create your model.  Don't ya just _love_ how easy it is!?
 
 #### models/ItemModel.rb
 ```ruby
@@ -457,20 +467,20 @@ Yep, that's it. Now see if you can figure out/google how to make your items crea
 #### controllers/ItemController.rb:
 
 ```ruby
- 	post '/add' do
+post '/' do
 
-  		pp params
+	pp params
 
-  		# this is how you add something with ActiveRecord.  so chill.
-		@item = Item.new
-		@item.title = params[:title]
-		@item.user_id = 1 # for now
-		@item.save
+	# this is how you add something with ActiveRecord.  
+	@item = Item.new
+	@item.title = params[:title]
+	@item.user_id = 1 # for now
+	@item.save
 
-		# hey there's a .to_json method. cool.
-		@item.to_json
+	# hey there's a .to_json method. cool.
+	@item.to_json
 
-	end
+end
  ```
 </details>
 <br>
@@ -479,13 +489,14 @@ Now try to use it.  Try to add some items with your form.
 
 ### Uh oh, it's broke, ain't it?
 
-Would be cool if it worked, but you likely get an error like "Undefined constant Item...." What's that all about? What did we forget? Think about it! See if you can fix it!
+Would be cool if it worked, but you likely get an error like "uninitialized constant Item...." What's that all about? What do you think that means. You actually read error messages *right*? What did we forget? Think about it! See if you can fix it!
 
 <details>
 
 #### config.ru, after controllers
 
 ```ruby
+#models
 require './models/ItemModel'
 ```
 
@@ -517,9 +528,9 @@ If you got JSON in the browser, and data in your items table and it all looks ri
 ### 11. Create an item index page.
 
 3 steps:
-* update item index route get all items with ActiveRecord before you render an `:item_index` template (that you're about to make). Code is very simple.  Try guessing/googling.  Use sending back JSON while you're working on it, then when it's done...
+* update item index route get all items with ActiveRecord before you render an `:item_index` template (that you're about to make). Code is very simple.  Try guessing/googling. Just send back JSON while you're figuring it out. Then once you get it and it's done...
 * create the `:item_index` partial that includes an "item list" `<h2>` and then iterates over `@items` to build a `<ul>` of `<li>`s. Render that template from index route.
-* When you have a working index page, update the item create (post) route to redirect to that index page
+* When you have a working index page, update the item create (post) route to redirect to that index page after it does the insert
 
 <details>
 	
@@ -538,7 +549,7 @@ If you got JSON in the browser, and data in your items table and it all looks ri
 #### views/item_index.erb
 
 ```erb
-<h2 style="border: 1px solid brown; border-radius: 5px">Item list</h2>
+<h2 style="border: 1px solid purple; border-radius: 5px">Item index</h2>
 <ul>
 	<% @items.each do |item| %>
 		<li><%= item.title %></li>
@@ -546,7 +557,7 @@ If you got JSON in the browser, and data in your items table and it all looks ri
 </ul> 
 ```
 
-#### controllers/ItemController.rb (again)
+#### controllers/ItemController.rb (again, but in the post '/' route this time)
 
 ```ruby
 		# @item.to_json # we will come back to this
@@ -567,35 +578,41 @@ Again, look at the terminal to see the SQL that's being written for you.
 
 ### 12. Since we have multiple pages, let's make a `<nav>` real quick.
 
-Add a nav.
+Add a nav. If you want you can also add a site-wide title.
 
 <details>
 
 #### views/layout.erb:
 
 ```
-	<nav>
-		<p style="display: inline-block;">Nav:</p>
-		<a href="/items">Item list</a> •
-		<a href="/items/add">Add Items</a>
-	</nav>
+  <nav>
+    <!-- REMEMBER: DO NOT USE INLINE STYLES.  -->
+    <p style="display: inline-block;">Nav:</p>
+    <a href="/items">Item list</a> •
+    <a href="/items/add">Add Items</a>
+  </nav>
+  
+  <h1 id="app-name">Awesome Site!</h1> 
 ```
+
+(also, now, if you want, you can remove the footer, whose only purpose was to have some viewable content coming from the `layout.erb` container template)
+
 </details>
 
 ---
 
-:red_circle: Commit: "12: Added a nav"
+:red_circle: Commit: "Added a nav"
 
 ---
 
 ### 13. Delete Functionality
 
 3 steps:
-* Add the MethodOverride middleware (shown)
-* Make each `<li>` in your index a form. The form will `DELETE` by `POST`ing and including a parameter `_method` set to `DELETE`, similarly to Express.  ***However***, this time, use `<input type=`hidden`>` to do it instead of adding it in the query string. How will you know it's working? (Click below to show answer)
+* Add the MethodOverride middleware (sound familiar??) (also, shown below)
+* Make each `<li>` in your index a form. The form will `DELETE` by `POST`ing and including a parameter `_method` set to `DELETE`, similarly to Express.  ***However***, this time, use `<input type='hidden'>` to do it instead of adding it in the query string. How will you know it's working? (Click below to show answer)
 
 <details>
-(when you click one of the delete buttons, "....doesn't know this ditty" should be telling you to add a delete route....)
+(when you click one of the delete buttons, "...doesn't know this ditty" should be telling you that you need to add a delete route....)
 </details>
 
 * So then go ahead and write the item delete route. See if you can figure out/google how to do it. Again, ActiveRecord--very simple. You could probably get it just by guessing. Remember to redirect to index so user can see that the delete was successful.
@@ -627,9 +644,11 @@ Add a nav.
 
 ```ruby
 	delete '/:id' do
-		# there are 1000 ways to do this, this is just one
+		# there are many ways to do this find statement, this is just one
+		# remember you can play around with ActiveRecord by adding binding.pry 
+		# and trying stuff out
 		@item = Item.find params[:id]
-		@item.delete
+		@item.destroy
 		redirect '/items'
 	end
  ```
@@ -638,7 +657,7 @@ Add a nav.
 </details>
 <br>
 
-Again, look at the SQL that's being generated for you.
+Again, look at the SQL that's being generated for you. If you can delete, then....
 
 ---
 
@@ -648,7 +667,9 @@ Again, look at the SQL that's being generated for you.
 
 ### 14.  Add a public folder for CSS and put all the CSS in it.
 
-Add a public folder for CSS. Move all your styles there where they belong because this isn't 1995 and we separate content and presentation/formatting/layout/design.
+Add a public folder for CSS. Move all your styles there where they belong because since this isn't 1995, we separate content and presentation/formatting/layout/design.
+
+Steps:
 
 * set it up on the server
 * link it up in the template
@@ -679,7 +700,7 @@ body {
 </details>
 <br>
 
-Then put the styles from your html in your CSS and add classes for them, where necessary in your html. How you do all of this is up to you, click below to see an example (html omitted) if you like.
+Then put the styles from your html in your CSS and add classes for them, where necessary in your html. How you do all of this is up to you, click below to see an example (html omitted) if you like.  You can delete the extra stuff like "everything in this red box", etc.
 
 <details>
 
@@ -690,14 +711,14 @@ body {
 	background-color: #f3d460;
 }
 
-/* from form.erb */
+/* from form.erb: be sure to add this class to that form while you're deleting the inline style */
 .form-partial {
 	border: 1px solid red; 
 	border-radius: 4px; 
 }
 
-/* from layout.erb */
-h1.app-name {
+/* style the h1 in layout.erb */
+h1#app-name {
 	border: 1px solid blue; 
 	border-radius: 10px;
 }
@@ -725,7 +746,7 @@ h2 {
 
 Try to create an edit functionality on your own. You have everything you need to do it at this point... you shouldn't need to google. 
 
->Don't forget: you can see the SQL that's being generated for you in your terminal.
+> Don't forget: you can see the SQL that's being generated for you in your terminal.
 
 * First create the edit link, route, and view. Make sure it works. Don't forget to override the method.
 
@@ -763,7 +784,7 @@ end
 </details>
 <br>
 
-* Then create the update route and have it redirect to '/items'. Make sure it works.  See the notes in the code below.
+* Then create the update route and have it redirect to `'/items'`. Make sure it works.  See the notes in the code below.
 
 <details>
 
@@ -867,7 +888,7 @@ end %>
 
 Pretty sweet, right?
 
->Reminder: Anytime you're trying to figure out anything with sessions, you can `pp session` to see what's in there.
+> Reminder: Anytime you're trying to figure out anything with sessions, you can `pp session` to see what's in there.
 
 ---
 
@@ -877,7 +898,7 @@ Pretty sweet, right?
 
 ## Login/register functionality.
 
-For parts 17 through 22, we will build a login and register functionality. Less guidance is provided. Based on what you've already done, think about what is required to build this and see if you can do it. Again, you have everything you need, so basically no googling should be required. Just keep asking yourself "what am I trying to do right now?" and "where have I done something like this before that worked?".  Don't forget to p or puts or print or pp things to make sure they're what you think they are, and don't forget that you can see any SQL that ActiveRecord wrote for you in your terminal.
+For parts 17 through 22, we will build a login and register functionality. Less guidance is provided. Based on what you've already done, think about what is required to build this and see if you can do it. Again, you have everything you need, so basically no googling should be required. Maybe a quick look back at class notes? Just keep asking yourself "what am I trying to do right now?" and "where have I done something like this before that worked?".  Don't forget to `p` or `puts` or `print` or `pp` things to make sure they're what you think they are, and don't forget that you can see any SQL that ActiveRecord wrote for you in your terminal.
 
 ### 17. Create a user model
 
@@ -900,6 +921,8 @@ require './models/UserModel'
 </details>
 <br>
 
+**Remember: we already have users in our DB schema.  Otherwise, we'd need to add that now**.
+
 ---
 
 :red_circle: Commit: "Added user model"
@@ -908,7 +931,7 @@ require './models/UserModel'
 
 ### 18. Make the parts: views and a controller with dummy routes.  
 
-Don't worry about making the login actually work yet, just make sure everything is set up first, as we've done above with items.  Routes exist, and just send back JSON.
+Don't worry about making the login actually work yet, just make sure everything is set up first, as we've done above with items.  Routes exist, and just send back JSON. **NOTE: ALL CONTROLLERS (except ApplicationController) IN A SINATRA APP INHERIT FROM APPLICATION CONTROLLER.**
 
 <details>
 
